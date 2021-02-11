@@ -13,5 +13,29 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+  displayName: 'Restore Buget Packages'
+
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+  displayName: 'Build projects'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+  displayName: 'Run Test'
+
+- task: DotNetCoreCLI@2
+  inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: '**/CustomerApi.csproj'
+      arguments: '--configuration $(buildConfiguration) --no-restore'
+      modifyOutputPath: false
+  displayName: 'Publish CustomerApi'
